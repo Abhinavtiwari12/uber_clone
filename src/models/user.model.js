@@ -2,7 +2,7 @@ import express from "express";
 import mongoose, {Schema} from "mongoose";
 import bcrypt from "bcrypt";
 import jwt, { sign } from "jsonwebtoken";
-import { use } from "react";
+import validator from "validator"
 
 
 const userSchema = new Schema ({
@@ -28,7 +28,11 @@ const userSchema = new Schema ({
         require: true,
         unique: true,
         lowercase: true,
-        trim: true 
+        trim: true,
+        validate:{
+            validator: validator.isEmail,
+            message: "Invilade email"
+        }
     },
     refreshToken:{
         type: String
