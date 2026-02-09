@@ -1,42 +1,45 @@
 import express from "express";
 import mongoose from "mongoose";
-import { ApiError } from "../utils/apiError";
-import { asyncHandler } from "../utils/asyncHandler";
-import { apiResponse } from "../utils/apiResponse";
-import { User } from "../models/user.model";
-import { findUser, registerUser } from "../service/user.service";
+import { ApiError } from "../utils/apiError.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { apiResponse } from "../utils/apiResponse.js";
+import { User } from "../models/user.model.js";
+import { findUser, registerUser } from "../service/user.service.js";
 
 
 
 
 
 const generateAccesaAndRefreshToken = async(userId) => {
-   try {
+//    try {
      const user = await User.findById(userId)
-     const accesToken = user.generateAccesToken()
+       if (!user) {
+    throw new Error("User not found while generating tokens");
+  }
+     const accessToken = user.generateAccessToken()
      const refreshToken = user.generateRefreshToken()
  
      user.refreshToken = refreshToken
-     await user.save({ validateBeforSave: false })
+     await user.save({ validateBeforeSave: false })
  
-     return accesToken, refreshToken
-   } catch (error) {
-        throw new ApiError(500, "Somthing went wrong while generating access and refresh token!!")
-   }
+     return accessToken, refreshToken
+//    } catch (error) {
+        // throw new ApiError(500, "Somthing went wrong while generating access and refresh token!!")
+//    }
 }
 
 
-const registerUser = asyncHandler(async (req, res) => {
-    const  { fullName, password, email, userNmae } =req.body
+const createUser = asyncHandler(async (req, res) => {
+    const  { fullName, password, email, userName } =req.body
 
     if (
-        [fullName, userNmae, password, email].some((feild) => feild?.trim() === "")
+        [fullName, userName, password, email].some((feild) => feild?.trim() === "")
     ) {
         throw new ApiError(400, "All feilds are require")
     }
 
     const checkExistedUser = {
-        userNmae,
+        userName,
         email
     }
     const existedUser = await findUser(checkExistedUser)
@@ -45,7 +48,8 @@ const registerUser = asyncHandler(async (req, res) => {
         fullName,
         email,
         password,
-        userNmae: userNmae.toLowerCase()
+        userName: userName.toLowerCase()
+        // userNmae,
     }
 
     const registeredUser = await registerUser(createUser)
@@ -78,7 +82,7 @@ const loginUser = asyncHandler(async (req, res) => {
         throw new ApiError(400, "username, email or password is wrong.")
     }
 
-    const {accesToken, refreshToken} = await generateAccesaAndRefreshToken(user._id)
+    const {accessToken, refreshToken} = await generateAccesaAndRefreshToken(user._id)
 
     const loggedInUser = await User.findById(user._id).select("-password -refreshToken -accessToken")
 
@@ -122,7 +126,7 @@ const userlogout = asyncHandler(async (req, res) => {
 
 
 export { 
-    registerUser,
+    createUser,
     loginUser,
     userlogout
  }
