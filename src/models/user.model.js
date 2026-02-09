@@ -1,7 +1,7 @@
 import express from "express";
 import mongoose, {Schema} from "mongoose";
 import bcrypt from "bcrypt";
-import jwt, { sign } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import validator from "validator"
 
 
@@ -13,7 +13,7 @@ const userSchema = new Schema ({
     },
     userName:{
         type: String,
-        require: true,
+        required: true,
         unique: true,
         lowercase: true,
         trim: true      
@@ -21,7 +21,7 @@ const userSchema = new Schema ({
     password:{
         type: String,
         require: true,
-        select: false
+        // select: false
     },
     email:{
         type: String,
