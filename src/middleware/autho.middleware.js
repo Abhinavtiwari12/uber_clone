@@ -8,14 +8,9 @@ import { User } from "../models/user.model.js";
 
 
  const verifyUserjwt = asyncHandler( async (req, res, next) => {
-    // try {
-        // const token = req.cookies?.accessToken  ||  req.header("Authorization")?.replace("Bearer", "")
-        console.log("header><><><><>>", req.header)
-        console.log("cookies><><><><",req.cookies)
+    try {
 
-        const token = req.cookies?.accessToken  ||  req.header("Authorization")?.replace("Bearer ", "").trim()
-
-        console.log("token><><><><<><><>", token)
+        const token = req.cookies?.accessToken  ||  req.header("Authorization")?.replace("Bearer ", "")
 
         if (!token) {
             throw new ApiError(401, "unathorized access")
@@ -31,9 +26,9 @@ import { User } from "../models/user.model.js";
         req.user = user;
         next()
 
-    // } catch (error) {
-    //     throw new ApiError(400, "invilad token access.")
-    // }
+    } catch (error) {
+        throw new ApiError(400, "invilad token access.")
+    }
 })
 
 
