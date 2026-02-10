@@ -1,8 +1,10 @@
 import express from "express";
-import { sign } from "jsonwebtoken";
+// import { sign } from "jsonwebtoken";
 import mongoose, { Schema } from "mongoose";
 import validator from "validator";
-import jwt from "jsonwebtoken"
+// import jwt from "jsonwebtoken"
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 
 const driverSchema = new Schema ({
@@ -97,7 +99,7 @@ driverSchema.methods.generateAccessToken = function () {
 )
 }
 
-driver.methods.generateRefreshToken = function () {
+driverSchema.methods.generateRefreshToken = function () {
     return jwt.sign({
         _id: this._id
     },
