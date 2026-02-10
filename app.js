@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import userRouter from "./src/router/user.router.js"
+import driverRoute from "./src/router/driver.router.js"
 
 
 const app = express();
@@ -25,5 +26,6 @@ app.use(cookieParser());
 
 
 app.use('/api/v1/user', userRouter)
+app.use('/api/v1/driver', driverRoute)
 
 export { app }
