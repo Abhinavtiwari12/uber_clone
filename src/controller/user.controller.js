@@ -68,9 +68,9 @@ const userlogin = asyncHandler(async (req, res) => {
         throw new ApiError(401, "Username or email is require.")
     }
 
-    const user = await User.findOne({
-        $or: [{userName}, {email}]
-    })
+    const query = email ? { email } : { userName };
+
+    const user = await User.findOne(query)
 
     if (!user) {
         throw new ApiError(400, "username, email or password is wrong.")
@@ -84,7 +84,7 @@ const userlogin = asyncHandler(async (req, res) => {
 
     const {accessToken, refreshToken} = await generateAccessAndRefereshTokens(user._id)
 
-    const loggedInUser = await User.findById(user._id).select("-password -refreshToken -accessToken")
+    const loggedInUser = await User.findById(user._id).select("-password")
 
     const options = {
         httpOnly: true,
@@ -122,11 +122,21 @@ const userlogout = asyncHandler(async (req, res) => {
 })
 
 
+const userProfile = async (req, res) => {
+  return res.status(200).json({
+    success: true,
+    user: req.user,
+  });
+};
+
+
+
 
 
 
 export { 
     createUser,
     userlogin,
-    userlogout
+    userlogout,
+    userProfile
  }
