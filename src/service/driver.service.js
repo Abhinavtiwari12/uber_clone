@@ -1,10 +1,10 @@
-import { driver } from "../models/driver.model";
+import { driver } from "../models/driver.model.js";
 
 
 export const findDriver = async (condition) => {
-  const driver = await driver.findOne(condition);
+  const drivers = await driver.findOne(condition);
 
-  if (!driver) {
+  if (!drivers) {
     return {
       success: false,
       message: "No user exist with this detail",
@@ -15,16 +15,16 @@ export const findDriver = async (condition) => {
   return {
     success: true,
     message: "User already exists",
-    data: user,
+    data: drivers,
   };
 };
 
 
 
 export const registerDriver = async (createUser) => {
-  const driver = await driver.create(createUser);
+  const drivers = await driver.create(createUser);
 
-  if (!driver) {
+  if (!drivers) {
     return {
       success: false,
       message: "User not created",
@@ -35,6 +35,6 @@ export const registerDriver = async (createUser) => {
   return {
     success: true,
     message: "User created successfully",
-    data: user,
+    data: drivers,
   };
 };

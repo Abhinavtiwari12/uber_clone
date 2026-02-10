@@ -10,12 +10,12 @@ import jwt from "jsonwebtoken";
 const driverSchema = new Schema ({
     fullName: {
         type: String,
-        require: true,
+        required: true,
         index: true
     },
     email: {
         type: String,
-        require: true,
+        required: true,
         unique: true,
         toLowerCase: true,
         trim: true,
@@ -26,7 +26,7 @@ const driverSchema = new Schema ({
     },
     userName: {
         type: String,
-        require: true,
+        required: true,
     },
     password: {
         type: String,
@@ -34,7 +34,7 @@ const driverSchema = new Schema ({
     },
     phoneNumber: {
         type: Number,
-        require: true,
+        required: true,
         minlength: [ 10, 'Color must be at least 10 characters long' ],
     },
      socketId: {

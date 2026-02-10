@@ -1,9 +1,10 @@
 import express from "express";
 import mongoose from "mongoose";
-import { asyncHandler } from "../utils/asyncHandler";
-import { ApiError } from "../utils/apiError";
-import { driver } from "../models/driver.model";
-import { findDriver, registerDriver } from "../service/driver.service";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { ApiError } from "../utils/apiError.js";
+import { driver } from "../models/driver.model.js";
+import { findDriver, registerDriver } from "../service/driver.service.js";
+import { apiResponse } from "../utils/apiResponse.js";
 
 
 
@@ -34,7 +35,7 @@ const registationForDriver = asyncHandler (async (req, res) => {
     const {fullName, userName, email, password, vehicle, phoneNumber} = req.body
 
      if (
-        [fullName, userName, password, email, vehicle, phoneNumber].some((feild) => feild?.trim() === "")
+        [fullName, userName, password, email, phoneNumber].some((field) => !field?.trim() ) || !vehicle
     ) {
         throw new ApiError(400, "All feilds are require")
     }
@@ -50,12 +51,15 @@ const registationForDriver = asyncHandler (async (req, res) => {
         userName,
         password,
         phoneNumber,
-        vehicle
+        vehicle,
+        email
     }
 
     const registerdDriver = await registerDriver(registerNewDriver)
 
     return res.status(201).json(
-        new apiResponse(201, registeredUser.data, registeredUser.message)
+        new apiResponse(201, registerdDriver.data, registerdDriver.message)
     )
 })
+
+export { registationForDriver }
