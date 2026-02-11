@@ -62,4 +62,38 @@ const registationForDriver = asyncHandler (async (req, res) => {
     )
 })
 
-export { registationForDriver }
+const logingDriver = asyncHandler (async (req, res) => {
+    const {email, userName, password} = req.body
+
+    if (!userName && !email) {
+        throw new ApiError(400,"provide details for login")
+    }
+
+    const query = email? {email} : {userName}
+
+    const driveR = await driver.findOne(query)
+
+    if (!driveR) {
+        throw new ApiError(401, "email or password is wrong")
+    }
+
+    const checkPassword = await driveR.isPasswordCorrect(password)
+
+    if (!checkPassword) {
+        throw new ApiError(401, "email or password is wrong")
+    }
+
+    const { accessToken, refreshToken } = await generateAccessAndRefereshTokens(driveR._id)
+
+    const loogedInDriver = await driver.findById(driveR._id).select("-password")
+
+    const options  ={
+        httpOnly: true,
+        secure : true,
+    }
+
+    return res.status(200).cookie("accessToken", accessToken, options).cookie("refreshToken", refreshToken, options)
+    .json(new apiResponse(200, {driveR : loogedInDriver, accessToken, refreshToken}, "driver loggedIn successfull."))
+})
+
+export { registationForDriver, logingDriver }
