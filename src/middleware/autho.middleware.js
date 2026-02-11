@@ -5,6 +5,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/apiError.js";
 import { User } from "../models/user.model.js";
 import { driver } from "../models/driver.model.js";
+import { findDriver } from "../service/driver.service.js";
 
 
 
@@ -43,13 +44,13 @@ import { driver } from "../models/driver.model.js";
         }
 
         const decodedToken =  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET)
-        const driver = await driver.findById(decodedToken?._id).select("-password -refreshToken")
+        const driveR = await driver.findById(decodedToken?._id).select("-password -refreshToken")
 
-        if (!driver) {
+        if (!driveR) {
             throw new ApiError(401, "invilad access token.")
         }
 
-        req.driver = driver;
+        req.driveR = driveR;
         next()
 
     } catch (error) {
@@ -58,4 +59,4 @@ import { driver } from "../models/driver.model.js";
 })
 
 
-export { verifyUserjwt }
+export { verifyUserjwt, verifyDriverjwt }
