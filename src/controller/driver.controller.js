@@ -62,7 +62,7 @@ const registationForDriver = asyncHandler (async (req, res) => {
     )
 })
 
-const logingDriver = asyncHandler (async (req, res) => {
+const logingDriver = asyncHandler (async (req, res, next) => {
     const {email, userName, password} = req.body
 
     if (!userName && !email) {
