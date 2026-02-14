@@ -1,8 +1,6 @@
 import express from "express";
-// import { sign } from "jsonwebtoken";
 import mongoose, { Schema } from "mongoose";
 import validator from "validator";
-// import jwt from "jsonwebtoken"
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
@@ -37,7 +35,7 @@ const driverSchema = new Schema ({
         required: true,
         minlength: [ 10, 'Color must be at least 10 characters long' ],
     },
-     socketId: {
+    socketId: {
         type: String,
     },
     status: {
@@ -73,7 +71,7 @@ const driverSchema = new Schema ({
             type: Number,
         }
     }
-})
+},{timestamps: true})
 
 driverSchema.pre("save", async function () {
     if(!this.isModified("password")) return;
