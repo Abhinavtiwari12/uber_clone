@@ -23,6 +23,14 @@ const userSchema = new Schema ({
         require: true,
         // select: false
     },
+     phoneNumber: {
+        type: Number,
+        required: true,
+        minlength: [ 10, 'Color must be at least 10 characters long' ],
+    },
+     socketId: {
+        type: String,
+    },
     email:{
         type: String,
         require: true,
@@ -36,7 +44,7 @@ const userSchema = new Schema ({
     },
     refreshToken:{
         type: String
-    },
+    }
 },{timestamps: true}
 )
 
