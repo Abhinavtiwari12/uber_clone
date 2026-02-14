@@ -8,26 +8,32 @@ import { apiResponse } from "../utils/apiResponse.js";
 
 
 
-const generateAccessAndRefereshTokens = asyncHandler (async (userId) => {
+const generateAccessAndRefereshTokens = async (userId) => {
     try {
-        const driver = await driver.findById(userId)
-
-        if (!driver) {
+        const newdriver = await driver.findById(userId)
+        console.log("new driver is ", newdriver);
+        
+        if (!newdriver) {
             throw new ApiError("driver not found while generatiing token")
         }
 
-        const accessToken = driver.generateAccessToken()
-        const refreshToken = driver.genetrateRefreshToken()
+        console.log("post debug 1");
+        
+        const accessToken = newdriver.generateAccessToken()
+        console.log("accessToken", accessToken);
+        
+        const refreshToken = newdriver.generateRefreshToken()
+        console.log("refreshToken", refreshToken);
 
-        driver.refreshToken = refreshToken
-        await driver.save({ validateBeforeSave: false })
+        newdriver.refreshToken = refreshToken
+        await newdriver.save({ validateBeforeSave: false })
 
         return { accessToken, refreshToken }
 
     } catch (error) {
         throw new ApiError(500, "somthing went wrong while generation and refreshing token!!")
     }
-})
+}
 
 
 const registationForDriver = asyncHandler (async (req, res) => {
@@ -121,4 +127,11 @@ const driverlogout = asyncHandler(async (req, res) => {
     .json(new apiResponse(200,{}, "User logout success."))
 })
 
-export { registationForDriver, logingDriver, driverlogout }
+const driverProfile = async (req, res) => {
+  return res.status(200).json({
+    success: true,
+    driveR: req.driveR,
+  });
+}
+
+export { registationForDriver, logingDriver, driverlogout, driverProfile }
