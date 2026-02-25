@@ -25,15 +25,20 @@ const driverSchema = new Schema ({
     userName: {
         type: String,
         required: true,
+        unique: true,
+        toLowerCase: true,
+        trim: true,
     },
     password: {
         type: String,
-        require: true,
+        required: true,
     },
     phoneNumber: {
-        type: Number,
+        type: String,
         required: true,
-        minlength: [ 10, 'Color must be at least 10 characters long' ],
+        minlength: 10,
+        maxlength: 13,
+        unique: true,
     },
     socketId: {
         type: String,
@@ -64,14 +69,19 @@ const driverSchema = new Schema ({
         }
     },
     location: {
-        ltd: {
-            type: Number,
+        type: {
+            type: String,
+            enum: ["Point"],
+            default: "Point"
         },
-        lng: {
-            type: Number,
+        coordinates: {
+            type: [Number],
+            default: [0,0]
         }
-    }
+    },
 },{timestamps: true})
+
+driverSchema.index({ location: "2dsphere" })
 
 driverSchema.pre("save", async function () {
     if(!this.isModified("password")) return;
@@ -111,4 +121,4 @@ driverSchema.methods.generateRefreshToken = function () {
 
 
 
-export const driver = new mongoose.model("driver", driverSchema)
+export const Driver = new mongoose.model("Driver", driverSchema)
