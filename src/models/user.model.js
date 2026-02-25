@@ -3,37 +3,39 @@ import mongoose, {Schema} from "mongoose";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import validator from "validator"
+import { maxLength } from "cookieparser";
 
 
 const userSchema = new Schema ({
     fullName:{
         type: String,
-        require: true,
+        required: true,
         index: true
     },
     userName:{
         type: String,
         required: true,
         unique: true,
-        lowercase: true,
+        toLowerCase: true,
         trim: true      
     },
     password:{
         type: String,
         require: true,
-        // select: false
+        select: false
     },
-     phoneNumber: {
-        type: Number,
+    phoneNumber: {
+        type: String,
         required: true,
-        minlength: [ 10, 'Color must be at least 10 characters long' ],
+        minlength: 10,
+        maxLength: 13
     },
-     socketId: {
+    socketId: {
         type: String,
     },
     email:{
         type: String,
-        require: true,
+        required: true,
         unique: true,
         lowercase: true,
         trim: true,
@@ -42,6 +44,10 @@ const userSchema = new Schema ({
             message: "Invilade email"
         }
     },
+    rides: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Ride"
+    }],
     refreshToken:{
         type: String
     }
