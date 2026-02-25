@@ -1,8 +1,8 @@
-import { driver } from "../models/driver.model.js";
+import { Driver } from "../models/driver.model.js";
 
 
 export const findDriver = async (condition) => {
-  const drivers = await driver.findOne(condition);
+  const drivers = await Driver.findOne(condition);
 
   if (!drivers) {
     return {
@@ -22,7 +22,7 @@ export const findDriver = async (condition) => {
 
 
 export const registerDriver = async (createUser) => {
-  const drivers = await driver.create(createUser);
+  const drivers = await Driver.create(createUser);
 
   if (!drivers) {
     return {

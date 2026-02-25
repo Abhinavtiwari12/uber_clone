@@ -2,7 +2,7 @@ import express from "express";
 import mongoose from "mongoose";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/apiError.js";
-import { driver } from "../models/driver.model.js";
+import { Driver } from "../models/driver.model.js";
 import { findDriver, registerDriver } from "../service/driver.service.js";
 import { apiResponse } from "../utils/apiResponse.js";
 
@@ -10,7 +10,7 @@ import { apiResponse } from "../utils/apiResponse.js";
 
 const generateAccessAndRefereshTokens = async (userId) => {
     try {
-        const newdriver = await driver.findById(userId)
+        const newdriver = await Driver.findById(userId)
         console.log("new driver is ", newdriver);
         
         if (!newdriver) {
@@ -77,13 +77,13 @@ const logingDriver = asyncHandler (async (req, res, next) => {
 
     const query = email? {email} : {userName}
 
-    const driveR = await driver.findOne(query)
+    const driver = await Driver.findOne(query)
 
-    if (!driveR) {
+    if (!driver) {
         throw new ApiError(401, "email or password is wrong")
     }
 
-    const checkPassword = await driveR.isPasswordCorrect(password)
+    const checkPassword = await driver.isPasswordCorrect(password)
 
     if (!checkPassword) {
         throw new ApiError(401, "email or password is wrong")
@@ -91,7 +91,7 @@ const logingDriver = asyncHandler (async (req, res, next) => {
 
     const { accessToken, refreshToken } = await generateAccessAndRefereshTokens(driveR._id)
 
-    const loogedInDriver = await driver.findById(driveR._id).select("-password")
+    const loogedInDriver = await Driver.findById(driver._id).select("-password")
 
     const options  ={
         httpOnly: true,
@@ -99,13 +99,13 @@ const logingDriver = asyncHandler (async (req, res, next) => {
     }
 
     return res.status(200).cookie("accessToken", accessToken, options).cookie("refreshToken", refreshToken, options)
-    .json(new apiResponse(200, {driveR : loogedInDriver, accessToken, refreshToken}, "driver loggedIn successfull."))
+    .json(new apiResponse(200, {driver : loogedInDriver, accessToken, refreshToken}, "driver loggedIn successfull."))
 })
 
 
 const driverlogout = asyncHandler(async (req, res) => {
-    await driver.findByIdAndUpdate(
-        req.driveR._id,
+    await Driver.findByIdAndUpdate(
+        req.driver._id,
         {
             $unset: {
                 refreshToken: 1
@@ -130,7 +130,7 @@ const driverlogout = asyncHandler(async (req, res) => {
 const driverProfile = async (req, res) => {
   return res.status(200).json({
     success: true,
-    driveR: req.driveR,
+    driver: req.driver,
   });
 }
 
