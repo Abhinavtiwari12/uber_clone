@@ -81,7 +81,7 @@ const driverSchema = new Schema ({
     },
 },{timestamps: true})
 
-driverSchema.index({ location: "2dsphere" })
+// driverSchema.index({ location: "2dsphere" })
 
 driverSchema.pre("save", async function () {
     if(!this.isModified("password")) return;

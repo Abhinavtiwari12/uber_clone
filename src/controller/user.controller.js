@@ -135,6 +135,7 @@ const createRide = asyncHandler(async (req, res) => {
 
     const { pickup, destination, fare } = req.body
 
+    // console.log("req.body><><><>", req.body)
     if (!pickup?.coordinates || !destination?.coordinates || !fare) {
         throw new ApiError(400, "All fields are required")
     }

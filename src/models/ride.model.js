@@ -1,6 +1,6 @@
 import mongoose, { Schema } from "mongoose";
-import { User } from "./user.model";
-import { driver } from "./driver.model";
+import { User } from "./user.model.js";
+import { Driver } from "./driver.model.js";
 
 
 const rideSchema  = new Schema ({
@@ -12,7 +12,7 @@ const rideSchema  = new Schema ({
     },
     driver: { 
         type: mongoose.Schema.Types.ObjectId, 
-        ref: "driver" 
+        ref: "Driver" 
     },
     pickup: {
         type: {
