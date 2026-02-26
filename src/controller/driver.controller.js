@@ -5,6 +5,7 @@ import { ApiError } from "../utils/apiError.js";
 import { Driver } from "../models/driver.model.js";
 import { findDriver, registerDriver } from "../service/driver.service.js";
 import { apiResponse } from "../utils/apiResponse.js";
+import { Ride } from "../models/ride.model.js";
 
 
 
@@ -89,7 +90,7 @@ const logingDriver = asyncHandler (async (req, res, next) => {
         throw new ApiError(401, "email or password is wrong")
     }
 
-    const { accessToken, refreshToken } = await generateAccessAndRefereshTokens(driveR._id)
+    const { accessToken, refreshToken } = await generateAccessAndRefereshTokens(driver._id)
 
     const loogedInDriver = await Driver.findById(driver._id).select("-password")
 
@@ -134,4 +135,54 @@ const driverProfile = async (req, res) => {
   });
 }
 
-export { registationForDriver, logingDriver, driverlogout, driverProfile }
+
+const acceptRide = asyncHandler(async (req, res) => {
+
+    const { rideId } = req.query
+
+    const ride = await Ride.findById(rideId)
+
+    if (!ride || ride.status !== "requested") {
+        throw new ApiError(400, "Ride not available")
+    }
+
+    ride.status = "accepted"
+    ride.driver = req.user._id
+    ride.acceptedAt = new Date()
+
+    await ride.save()
+
+    return res.status(200).json({
+        success: true,
+        message: "Ride accepted",
+        ride
+    })
+})
+
+
+const startRide = asyncHandler(async (req, res) => {
+
+    const { rideId } = req.params
+
+    const ride = await Ride.findOne({
+        _id: rideId,
+        driver: req.user._id
+    })
+
+    if (!ride || ride.status !== "accepted") {
+        throw new ApiError(400, "Ride cannot be started")
+    }
+
+    ride.status = "started"
+    ride.startedAt = new Date()
+
+    await ride.save()
+
+    return res.status(200).json({
+        success: true,
+        message: "Ride started",
+        ride
+    })
+})
+
+export { registationForDriver, logingDriver, driverlogout, driverProfile, acceptRide }
