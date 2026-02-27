@@ -12,19 +12,14 @@ import { Ride } from "../models/ride.model.js";
 const generateAccessAndRefereshTokens = async (userId) => {
     try {
         const newdriver = await Driver.findById(userId)
-        console.log("new driver is ", newdriver);
+        // console.log("new driver is ", newdriver);
         
         if (!newdriver) {
             throw new ApiError("driver not found while generatiing token")
         }
-
-        console.log("post debug 1");
         
         const accessToken = newdriver.generateAccessToken()
-        console.log("accessToken", accessToken);
-        
         const refreshToken = newdriver.generateRefreshToken()
-        console.log("refreshToken", refreshToken);
 
         newdriver.refreshToken = refreshToken
         await newdriver.save({ validateBeforeSave: false })
@@ -142,6 +137,16 @@ const acceptRide = asyncHandler(async (req, res) => {
 
     const ride = await Ride.findById(rideId)
 
+    const driver = await Driver.findById(req.user._id)
+
+    if (!driver) {
+        throw new ApiError(404, "Driver not found")
+    }
+
+    if (driver.status === "inactive" ) {
+        throw new ApiError(400, "you can't accept ride during inactive mode")
+    }
+
     if (!ride || ride.status !== "requested") {
         throw new ApiError(400, "Ride not available")
     }
@@ -185,4 +190,144 @@ const startRide = asyncHandler(async (req, res) => {
     })
 })
 
-export { registationForDriver, logingDriver, driverlogout, driverProfile, acceptRide }
+
+const completeRide = asyncHandler(async (req, res) => {
+
+    const { rideId } = req.params
+
+    const ride = await Ride.findOne({
+        _id: rideId,
+        driver: req.user._id
+    })
+
+    if (!ride || ride.status !== "started") {
+        throw new ApiError(400, "Ride cannot be completed")
+    }
+
+    ride.status = "completed"
+    ride.completedAt = new Date()
+
+    await ride.save()
+
+    return res.status(200).json({
+        success: true,
+        message: "Ride completed",
+        ride
+    })
+})
+
+const updateDriverLocation = asyncHandler(async (req, res) => {
+
+    const { lng, lat } = req.body
+
+    if (lng === undefined || lat === undefined) {
+        throw new ApiError(400, "lng and lat are required")
+    }
+
+    const driver = await Driver.findByIdAndUpdate(
+        req.user._id,
+        {
+            location: {
+                type: "Point",
+                coordinates: [lng, lat]
+            }
+        },
+        { new: true }
+    )
+
+    if (!driver) {
+        throw new ApiError(404, "Driver not found")
+    }
+
+    res.status(200).json({
+        success: true,
+        message: "Location updated",
+        location: driver.location
+    })
+})
+
+
+const toggleDriverAvailability = asyncHandler(async (req, res) => {
+
+    const driver = await Driver.findById(req.user._id)
+
+    if (!driver) {
+        throw new ApiError(404, "Driver not found")
+    }
+
+    if (driver.status === "active" && driver.currentRide) {
+        throw new ApiError(400, "Cannot go offline during active ride")
+    }
+
+    driver.status = driver.status === "active" ? "inactive" : "active"
+
+    await driver.save()
+
+    res.status(200).json({
+        success: true,
+        message: `Driver is now ${driver.status}`,
+        status: driver.status
+    })
+})
+
+const getDriverTotalEarnings = asyncHandler(async (req, res) => {
+
+    const driverId = req.user._id
+
+    const result = await Ride.aggregate([
+        {
+            $match: {
+                driver: driverId,
+                status: "completed"
+            }
+        },
+        {
+            $group: {
+                _id: null,
+                totalEarnings: { $sum: "$fare" },
+                totalRides: { $sum: 1 }
+            }
+        }
+    ])
+
+    const totalEarnings = result[0]?.totalEarnings || 0
+    const totalRides = result[0]?.totalRides || 0
+
+    return res.status(200).json({
+        success: true,
+        totalEarnings,
+        totalCompletedRides: totalRides
+    })
+})
+
+const getDriverRideHistory = asyncHandler(async (req, res) => {
+
+    const driverId = req.user._id
+
+    const rides = await Ride.find({
+        driver: driverId
+    })
+    .sort({ createdAt: -1 })
+    .populate("user", "fullName phoneNumber")
+    .select("pickup destination fare status acceptedAt startedAt completedAt cancelledAt")
+
+    return res.status(200).json({
+        success: true,
+        totalRides: rides.length,
+        rides
+    })
+})
+
+export { 
+    registationForDriver, 
+    logingDriver, 
+    driverlogout, 
+    driverProfile, 
+    acceptRide, 
+    startRide,
+    completeRide,
+    updateDriverLocation,
+    toggleDriverAvailability,
+    getDriverTotalEarnings,
+    getDriverRideHistory
+}
