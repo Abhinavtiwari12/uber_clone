@@ -31,10 +31,10 @@ const generateAccessAndRefereshTokens = async(userId) => {
 
 
 const createUser = asyncHandler(async (req, res) => {
-    const  { fullName, password, email, userName } =req.body
+    const  { fullName, password, email, userName,phoneNumber } =req.body
 
     if (
-        [fullName, userName, password, email].some((feild) => feild?.trim() === "")
+        [fullName, userName, password, email, phoneNumber].some((feild) => feild?.trim() === "")
     ) {
         throw new ApiError(400, "All feilds are require")
     }
@@ -49,6 +49,7 @@ const createUser = asyncHandler(async (req, res) => {
         fullName,
         email,
         password,
+        phoneNumber,
         userName: userName.toLowerCase()
         // userNmae,
     }
@@ -148,6 +149,11 @@ const createRide = asyncHandler(async (req, res) => {
         status: "requested"
     })
 
+    await User.findByIdAndUpdate(
+        req.user._id,
+        { $push: { rides: ride._id } }
+    )
+
     return res.status(201).json({
         success: true,
         message: "Ride created successfully",
@@ -200,6 +206,32 @@ const getUserRides = asyncHandler(async (req, res) => {
     })
 })
 
+const getRideCurrentStatus = asyncHandler( async (req, res) => {
+
+    const { rideId } = req.params
+
+    const ride = await Ride.findOne({
+        _id: rideId,
+        user: req.user._id
+    }).select(" status acceptedAt startedAt completedAt cancelledAt driver ")
+
+    if (!ride) {
+        throw new ApiError(400, "ride not found ")
+    }
+
+    return res.status(200).json({
+        success: true,
+        rideId: ride._id,
+        status: ride.status,
+        timeline: {
+            acceptedAt: ride.acceptedAt,
+            startedAt: ride.startedAt,
+            completedAt: ride.completedAt,
+            cancelledAt: ride.cancelledAt
+        }
+    })
+
+})
 
 export { 
     createUser,
@@ -208,5 +240,6 @@ export {
     userProfile,
     createRide,
     cancelRide,
-    getUserRides
+    getUserRides,
+    getRideCurrentStatus
  }
