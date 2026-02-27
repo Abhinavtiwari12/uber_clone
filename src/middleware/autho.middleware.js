@@ -50,7 +50,7 @@ import { findDriver } from "../service/driver.service.js";
             throw new ApiError(401, "invilad access token.")
         }
 
-        req.driveR = driveR;
+        req.user = driveR;
         next()
 
     } catch (error) {
