@@ -134,18 +134,31 @@ const userProfile = async (req, res) => {
 
 const createRide = asyncHandler(async (req, res) => {
 
-    const { pickup, destination, fare } = req.body
+    const { pickup, destination, distance } = req.body
 
     // console.log("req.body><><><>", req.body)
-    if (!pickup?.coordinates || !destination?.coordinates || !fare) {
+    if (!pickup?.coordinates || !destination?.coordinates || !distance) {
         throw new ApiError(400, "All fields are required")
     }
+
+    if (distance <= 0) {
+        throw new ApiError(400, "Distance must be greater than 0")
+    }
+
+    // Pricing Logic
+    const baseFare = 40
+    const perKmRate = 15
+
+    let totalFare = baseFare + (perKmRate * distance)
+
+    if (totalFare < 60) totalFare = 60
 
     const ride = await Ride.create({
         user: req.user._id,   
         pickup,
         destination,
-        fare,
+        distance,
+        fare: totalFare,
         status: "requested"
     })
 
@@ -233,6 +246,39 @@ const getRideCurrentStatus = asyncHandler( async (req, res) => {
 
 })
 
+const addTipToRide = asyncHandler(async (req, res) => {
+
+    const { rideId } = req.params
+    const { tipAmount } = req.body
+
+    if (!tipAmount || tipAmount <= 0) {
+        throw new ApiError(400, "Valid tip amount required")
+    }
+
+    const ride = await Ride.findById(rideId)
+
+    if (!ride) {
+        throw new ApiError(404, "Ride not found")
+    }
+
+    if (ride.status !== "completed") {
+        throw new ApiError(400, "Tip can only be added after ride completion")
+    }
+
+    if (ride.tip > 0) {
+        throw new ApiError(400, "Tip already added for this ride")
+    }
+
+    ride.tip = tipAmount
+    await ride.save()
+
+    return res.status(200).json({
+        success: true,
+        message: "Tip added successfully",
+        tip: ride.tip
+    })
+})
+
 export { 
     createUser,
     userlogin,
@@ -241,5 +287,6 @@ export {
     createRide,
     cancelRide,
     getUserRides,
-    getRideCurrentStatus
+    getRideCurrentStatus,
+    addTipToRide
  }
