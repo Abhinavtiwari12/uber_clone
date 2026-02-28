@@ -8,6 +8,7 @@ import {
     getDriverTotalEarnings, 
     logingDriver, 
     registationForDriver, 
+    showRequestedRides, 
     startRide, 
     toggleDriverAvailability, 
     updateDriverLocation 
@@ -29,6 +30,7 @@ router.route('/updateDriverLocation').post(verifyDriverjwt, updateDriverLocation
 router.route('/toggleDriverAvailability').post(verifyDriverjwt, toggleDriverAvailability)
 router.route('/getDriverTotalEarnings').get(verifyDriverjwt, getDriverTotalEarnings)
 router.route('/getDriverRideHistory').get(verifyDriverjwt, getDriverRideHistory)
+router.route('/showRequestedRides').get(verifyDriverjwt, showRequestedRides)
 
 
 export default router
