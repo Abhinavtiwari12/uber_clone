@@ -318,6 +318,18 @@ const getDriverRideHistory = asyncHandler(async (req, res) => {
     })
 })
 
+const showRequestedRides = asyncHandler(async (req, res) => {
+    const rides = await Ride.find({ status: "requested" })
+    .populate("user", "fullName phoneNumber")
+    .sort({ createdAt: -1})
+    
+    return res.status(200).json({
+        success: true,
+        count: rides.length,
+        rides
+    })
+})
+
 export { 
     registationForDriver, 
     logingDriver, 
@@ -329,5 +341,6 @@ export {
     updateDriverLocation,
     toggleDriverAvailability,
     getDriverTotalEarnings,
-    getDriverRideHistory
+    getDriverRideHistory,
+    showRequestedRides
 }
