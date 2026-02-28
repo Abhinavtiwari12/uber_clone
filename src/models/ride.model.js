@@ -43,6 +43,15 @@ const rideSchema  = new Schema ({
         required: true,
         min: 0
     },
+    tip: {
+        type: Number,
+        default: 0,
+        min: 0
+    },
+    distance: {
+        type: Number,
+        required: true
+    },
     status: {
        type: String,
        enum: ["requested", "accepted", "started", "completed", "cancelled"],
