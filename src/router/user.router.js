@@ -7,7 +7,8 @@ import {
     createRide, 
     cancelRide, 
     getUserRides, 
-    getRideCurrentStatus 
+    getRideCurrentStatus, 
+    addTipToRide
 } from "../controller/user.controller.js";
 import { verifyUserjwt } from "../middleware/autho.middleware.js";
 
@@ -23,6 +24,8 @@ router.route('/createRide').post(verifyUserjwt, createRide)
 router.route('/cancelRide/:rideId').post(verifyUserjwt, cancelRide)
 router.route('/getUserRides').get(verifyUserjwt, getUserRides)
 router.route('/getRideCurrentStatus/:rideId').get(verifyUserjwt, getRideCurrentStatus)
+router.route('/addTipToRide/:rideId').post(verifyUserjwt, addTipToRide)
+
 
 
 export default router
