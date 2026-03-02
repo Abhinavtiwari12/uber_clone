@@ -9,8 +9,6 @@ import { Ride } from "../models/ride.model.js";
 
 
 
-
-
 const generateAccessAndRefereshTokens = async(userId) => {
    try {
      const user = await User.findById(userId)
@@ -51,7 +49,6 @@ const createUser = asyncHandler(async (req, res) => {
         password,
         phoneNumber,
         userName: userName.toLowerCase()
-        // userNmae,
     }
 
     const registeredUser = await registerUser(createUser)
@@ -136,7 +133,6 @@ const createRide = asyncHandler(async (req, res) => {
 
     const { pickup, destination, distance } = req.body
 
-    // console.log("req.body><><><>", req.body)
     if (!pickup?.coordinates || !destination?.coordinates || !distance) {
         throw new ApiError(400, "All fields are required")
     }
@@ -145,7 +141,6 @@ const createRide = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Distance must be greater than 0")
     }
 
-    // Pricing Logic
     const baseFare = 40
     const perKmRate = 15
 

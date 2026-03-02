@@ -1,5 +1,3 @@
-// require ('dotenv').config()
-
 import dotenv from 'dotenv'
 
 import express from "express";
@@ -20,5 +18,3 @@ connectDB()
 .catch((err) =>{
     console.log("mongoose connectioon failed", err)
 })
-
-// app.listen(process.env.PORT)

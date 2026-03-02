@@ -12,7 +12,6 @@ import { Ride } from "../models/ride.model.js";
 const generateAccessAndRefereshTokens = async (userId) => {
     try {
         const newdriver = await Driver.findById(userId)
-        // console.log("new driver is ", newdriver);
         
         if (!newdriver) {
             throw new ApiError("driver not found while generatiing token")

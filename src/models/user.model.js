@@ -3,7 +3,6 @@ import mongoose, {Schema} from "mongoose";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import validator from "validator"
-// import { maxLength } from "cookieparser";
 
 
 const userSchema = new Schema ({
@@ -22,7 +21,6 @@ const userSchema = new Schema ({
     password:{
         type: String,
         require: true,
-        // select: false
     },
     phoneNumber: {
         type: String,
